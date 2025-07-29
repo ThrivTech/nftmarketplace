@@ -1,0 +1,24 @@
+# Logs
+logs
+*.log
+
+# Dependency directories
+node_modules/
+dist/
+dist-ssr/
+
+# Editor settings
+.vscode/
+.idea/
+.DS_Store
+
+# Build artifacts
+*.local
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment
+.env
