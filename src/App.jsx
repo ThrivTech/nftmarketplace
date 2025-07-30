@@ -1,51 +1,91 @@
-import NavigationBar from './components/NavigationBar'
-import ListView from './components/ListView'
-import Contact from './components/Contact'
- 
-
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/login';
+import Signup from './pages/Signup';
+import Marketplace from './pages/Marketplace';
+import ThemeToggleButton from './components/ThemeToggleButton';
 
 function App() {
-  const navLinks = [
-    { title: 'Home', href: '#' },
-    { title: 'Explore', href: '#' },
-    { title: 'Marketplace', href: '#' },
-    { title: 'Contact', href: '#' },
-  ]
+  const [theme, setTheme] = useState(() => {
+    // Initialize theme from local storage or system preference
+    if (localStorage.getItem('theme')) {
+      return localStorage.getItem('theme');
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
 
-  const nftItems = [
-    {
-      image: 'https://via.placeholder.com/200x200.png?text=NFT+1',
-      name: 'Cyber Punk Ape',
-      owner: '@johnDoe',
-      price: '2.5',
-    },
-    {
-      image: 'https://via.placeholder.com/200x200.png?text=NFT+2',
-      name: 'Pixel Art Hero',
-      owner: '@saraCrypto',
-      price: '1.2',
-    },
-    {
-      image: 'https://via.placeholder.com/200x200.png?text=NFT+3',
-      name: 'Meta Robot',
-      owner: '@robotMan',
-      price: '3.1',
-    },
-  ]
+  const [user, setUser] = useState(() => {
+    // Check if user is logged in from localStorage
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
-  const contactInfo = {
-    email: 'support@nftstorm.com',
-    address: '123 Web3 Lane, Blockchain City',
-    copyright: '© 2025 NFTStorm',
-  }
+  useEffect(() => {
+    // Apply theme to document
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+  };
 
   return (
-    <div className="bg-black min-h-screen text-white">
-      <NavigationBar links={navLinks} />
-      <ListView items={nftItems} />
-      <Contact contactInfo={contactInfo} />
+    <div className="min-h-screen theme-bg-primary">
+      <Router>
+        {/* Theme toggle button - available on all pages */}
+        <ThemeToggleButton theme={theme} setTheme={setTheme} />
+
+        <Routes>
+          {/* Public routes */}
+          <Route 
+            path="/" 
+            element={
+              user ? (
+                <Navigate to="/marketplace" replace />
+              ) : (
+                <Login onLogin={handleLogin} />
+              )
+            } 
+          />
+          <Route 
+            path="/signup" 
+            element={
+              user ? (
+                <Navigate to="/marketplace" replace />
+              ) : (
+                <Signup onLogin={handleLogin} />
+              )
+            } 
+          />
+          
+          {/* Protected routes */}
+          <Route 
+            path="/marketplace" 
+            element={
+              user ? (
+                <Marketplace user={user} onLogout={handleLogout} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            } 
+          />
+          
+          {/* Catch all route */}
+          <Route 
+            path="*" 
+            element={<Navigate to={user ? "/marketplace" : "/"} replace />} 
+          />
+        </Routes>
+      </Router>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
