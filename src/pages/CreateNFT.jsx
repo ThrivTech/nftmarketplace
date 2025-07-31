@@ -1,13 +1,12 @@
 // src/pages/CreateNFT.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 const CreateNFT = ({ theme }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  // Generate image preview when a file is selected
   useEffect(() => {
     if (image) {
       const objectUrl = URL.createObjectURL(image);
@@ -20,16 +19,21 @@ const CreateNFT = ({ theme }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log({ name, description, image });
-    // TODO: Upload logic goes here
   };
 
   return (
-    <section className={`min-h-screen px-4 py-12 flex items-center justify-center ${
-      theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'
-    }`}>
-      <div className={`w-full max-w-xl rounded-lg shadow-md p-8 ${
-        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-      }`}>
+    <section
+      className={`min-h-screen px-4 py-12 flex items-center justify-center ${
+        theme === "dark"
+          ? "bg-gray-900 text-white"
+          : "bg-gray-100 text-gray-900"
+      }`}
+    >
+      <div
+        className={`w-full max-w-xl rounded-lg shadow-md p-8 ${
+          theme === "dark" ? "bg-gray-800" : "bg-white"
+        }`}
+      >
         <h2 className="text-3xl font-bold mb-6 text-center">Create NFT</h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -41,9 +45,9 @@ const CreateNFT = ({ theme }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={`w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition focus:ring-2 focus:ring-blue-500 ${
-                theme === 'dark'
-                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                  : 'bg-gray-50 border-gray-300 text-gray-900'
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                  : "bg-gray-50 border-gray-300 text-gray-900"
               }`}
               placeholder="Enter NFT title"
               required
@@ -52,15 +56,17 @@ const CreateNFT = ({ theme }) => {
 
           {/* Description */}
           <div>
-            <label className="block mb-1 text-sm font-medium">Description</label>
+            <label className="block mb-1 text-sm font-medium">
+              Description
+            </label>
             <textarea
-              rows={6}
+              rows={15}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className={`w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition focus:ring-2 focus:ring-blue-500 resize-none ${
-                theme === 'dark'
-                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                  : 'bg-gray-50 border-gray-300 text-gray-900'
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                  : "bg-gray-50 border-gray-300 text-gray-900"
               }`}
               placeholder="Describe your NFT..."
               required
@@ -69,12 +75,14 @@ const CreateNFT = ({ theme }) => {
 
           {/* Image Upload */}
           <div>
-            <label className="block mb-2 text-sm font-medium">Upload Image</label>
+            <label className="block mb-2 text-sm font-medium">
+              Upload Image
+            </label>
             <div
-              className={`relative flex flex-col items-center justify-center w-full border-2 border-dashed rounded-lg cursor-pointer aspect-square transition ${
-                theme === 'dark'
-                  ? 'border-gray-600 hover:border-blue-400 bg-gray-700'
-                  : 'border-gray-300 hover:border-blue-500 bg-gray-50'
+              className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer transition ${
+                theme === "dark"
+                  ? "border-gray-600 hover:border-blue-400 bg-gray-700"
+                  : "border-gray-300 hover:border-blue-500 bg-gray-50"
               }`}
             >
               <input
@@ -85,7 +93,11 @@ const CreateNFT = ({ theme }) => {
                 required
               />
               {preview ? (
-                <img src={preview} alt="NFT preview" className="object-contain max-h-64 p-4" />
+                <img
+                  src={preview}
+                  alt="NFT preview"
+                  className="object-contain max-h-24 p-4"
+                />
               ) : (
                 <div className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
                   Click or drag an image file to upload
