@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { Menu, X, LogOut, User } from 'lucide-react';
+import React, { useState } from "react";
+import { Menu, X, LogOut, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const NavigationBar = ({ user, onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-
+  
   const navigationLinks = [
-    { title: 'Marketplace', href: '#marketplace' },
-    { title: 'My NFTs', href: '#my-nfts' },
-    { title: 'Create', href: '#create' },
-    { title: 'Activity', href: '#activity' },
+    { title: "Marketplace", path: "/marketplace" },
+    { title: "My NFTs", path: "/my-nfts" },
+    { title: "Create", path: "/create-nft" },
+    { title: "Activity", path: "/activity" }, // optional
   ];
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem("user");
     onLogout();
   };
 
@@ -22,20 +23,22 @@ const NavigationBar = ({ user, onLogout }) => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">NFTStorm</h1>
+            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              NFTStorm
+            </h1>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navigationLinks.map((link, idx) => (
-                <a
+                <Link
                   key={idx}
-                  href={link.href}
+                  to={link.path}
                   className="text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   {link.title}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -59,7 +62,7 @@ const NavigationBar = ({ user, onLogout }) => {
                   )}
                 </div>
                 <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                  {user?.username || 'User'}
+                  {user?.username || "User"}
                 </span>
               </div>
 
@@ -81,7 +84,11 @@ const NavigationBar = ({ user, onLogout }) => {
               className="inline-flex items-center justify-center p-2 rounded-md text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-colors"
               aria-label="Toggle Menu"
             >
-              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {menuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
             </button>
           </div>
         </div>
@@ -92,16 +99,16 @@ const NavigationBar = ({ user, onLogout }) => {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
             {navigationLinks.map((link, idx) => (
-              <a
+              <Link
                 key={idx}
-                href={link.href}
-                className="text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                to={link.path}
                 onClick={() => setMenuOpen(false)}
+                className="text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 rounded-md text-base font-medium transition-colors"
               >
                 {link.title}
-              </a>
+              </Link>
             ))}
-            
+
             {/* Mobile User Profile */}
             <div className="border-t border-slate-200 dark:border-slate-800 pt-4 pb-3">
               <div className="flex items-center px-3 space-x-3">
@@ -120,10 +127,10 @@ const NavigationBar = ({ user, onLogout }) => {
                 </div>
                 <div>
                   <div className="text-base font-medium text-slate-900 dark:text-slate-100">
-                    {user?.username || 'User'}
+                    {user?.username || "User"}
                   </div>
                   <div className="text-sm text-slate-600 dark:text-slate-400">
-                    {user?.email || 'user@example.com'}
+                    {user?.email || "user@example.com"}
                   </div>
                 </div>
               </div>

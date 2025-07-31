@@ -1,0 +1,87 @@
+// src/data/dummyNFTs.js
+export const dummyNFTs = [
+  {
+    id: 1,
+    title: 'Cosmic Dreams #001',
+    description: 'A beautiful cosmic artwork representing dreams and aspirations.',
+    image: 'https://images.unsplash.com/photo-1618005198919-d3d4b5dba36f?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  },
+  {
+    id: 2,
+    title: 'Digital Sunset',
+    description: 'A stunning digital representation of a sunset.',
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  },
+  {
+    id: 3,
+    title: 'Abstract Geometry',
+    description: 'Modern abstract geometric patterns.',
+    image: 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  },
+  {
+    id: 4,
+    title: 'Neon City',
+    description: 'Cyberpunk inspired neon cityscape.',
+    image: 'https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  },
+  {
+    id: 5,
+    title: 'Ocean Waves',
+    description: 'Peaceful ocean waves in digital art form.',
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  },
+  {
+    id: 6,
+    title: 'Space Explorer',
+    description: 'Journey through space and time.',
+    image: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  },
+  {
+    id: 7,
+    title: 'Floral Burst',
+    description: 'A vibrant burst of floral fantasy.',
+    image: 'https://images.unsplash.com/photo-1516715094483-94c3cb1b89b7?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  },
+  {
+    id: 8,
+    title: 'Ice Mountains',
+    description: 'Frozen mountains under aurora skies.',
+    image: 'https://images.unsplash.com/photo-1549887534-578081f9c78d?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  },
+  {
+    id: 9,
+    title: 'Digital Jungle',
+    description: 'An artistic interpretation of tech in nature.',
+    image: 'https://images.unsplash.com/photo-1493244040629-496f6d136cc3?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  },
+  {
+    id: 10,
+    title: 'Moonlight Mirage',
+    description: 'Ethereal night desert with moonlight glow.',
+    image: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  },
+  {
+    id: 11,
+    title: 'Galactic Bloom',
+    description: 'Blooming stars in a digital cosmos.',
+    image: 'https://images.unsplash.com/photo-1493612276216-ee3925520721?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  },
+  {
+    id: 12,
+    title: 'Cyber Rose',
+    description: 'Futuristic rose in neon lights.',
+    image: 'https://images.unsplash.com/photo-1518972559570-0b38b9ad8030?auto=format&fit=crop&w=600&q=80',
+    forSale: false,
+  }
+];
