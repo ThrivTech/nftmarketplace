@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -5,16 +6,15 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Login from "./pages/login";
+import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Marketplace from "./pages/Marketplace";
-import ThemeToggleButton from "./components/ThemeToggleButton";
 import CreateNFT from "./pages/CreateNFT";
 import MyNFTs from "./pages/MyNFTs";
+import ThemeToggleButton from "./components/ThemeToggleButton";
 
 function App() {
   const [theme, setTheme] = useState(() => {
-    // Initialize theme from local storage or system preference
     if (localStorage.getItem("theme")) {
       return localStorage.getItem("theme");
     }
@@ -24,13 +24,11 @@ function App() {
   });
 
   const [user, setUser] = useState(() => {
-    // Check if user is logged in from localStorage
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
   useEffect(() => {
-    // Apply theme to document
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
     localStorage.setItem("theme", theme);
@@ -48,11 +46,12 @@ function App() {
   return (
     <div className="min-h-screen theme-bg-primary">
       <Router>
-        {/* Theme toggle button - available on all pages */}
-        <ThemeToggleButton theme={theme} setTheme={setTheme} />
-
+        {!user && (
+          <div className="fixed top-4 right-4 z-50">
+            <ThemeToggleButton theme={theme} setTheme={setTheme} />
+          </div>
+        )}
         <Routes>
-          {/* Public routes */}
           <Route
             path="/"
             element={
@@ -73,13 +72,16 @@ function App() {
               )
             }
           />
-
-          {/* Protected routes */}
           <Route
             path="/marketplace"
             element={
               user ? (
-                <Marketplace user={user} onLogout={handleLogout} />
+                <Marketplace
+                  user={user}
+                  onLogout={handleLogout}
+                  theme={theme}
+                  setTheme={setTheme}
+                />
               ) : (
                 <Navigate to="/" replace />
               )
@@ -89,25 +91,30 @@ function App() {
             path="/create-nft"
             element={
               user ? (
-                <CreateNFT user={user} theme={theme} onLogout={handleLogout} />
+                <CreateNFT
+                  user={user}
+                  theme={theme}
+                  onLogout={handleLogout}
+                />
               ) : (
                 <Navigate to="/" replace />
               )
             }
           />
-
           <Route
             path="/my-nfts"
             element={
               user ? (
-                <MyNFTs isDark={theme === "dark"} />
+                <MyNFTs
+                  user={user}
+                  theme={theme}
+                  onLogout={handleLogout}
+                />
               ) : (
                 <Navigate to="/" replace />
               )
             }
           />
-
-          {/* Catch all route */}
           <Route
             path="*"
             element={<Navigate to={user ? "/marketplace" : "/"} replace />}
