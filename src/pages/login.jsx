@@ -1,44 +1,101 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { authenticateUser } from '../data/dummyData';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import API from "../api";
 
 const Login = ({ onLogin, theme, setTheme }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setIsLoading(true);
+    setError("");
 
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const res = await API.post("/auth/login", { email, password });
+
+      // Debug: Log the actual response to understand the structure
+      console.log("Full response:", res);
+      console.log("Response data:", res.data);
+
+      // Extract token from response
+      const token = res.data.token || res.data.accessToken;
       
-      const user = authenticateUser(email, password);
-      if (user) {
-        localStorage.setItem('user', JSON.stringify(user));
-        onLogin(user);
-        navigate('/marketplace');
-      } else {
-        setError('Invalid email or password');
+      if (!token) {
+        throw new Error('No authentication token received from server');
       }
+
+      // Store the token
+      localStorage.setItem("token", token);
+
+      // Since your backend doesn't return user data directly, 
+      // we need to fetch it using the token
+      try {
+        // Make a request to get user profile using the token
+        const userRes = await API.get('/user/me'); // or whatever endpoint returns user data
+        console.log("User data response:", userRes.data);
+        
+        const user = userRes.data;
+        
+        if (!user || (!user.username && !user.name)) {
+          throw new Error('No valid user data received from server');
+        }
+
+        // Store user data
+        localStorage.setItem("user", JSON.stringify(user));
+
+        // Update parent state
+        onLogin(user);
+        
+        // Navigate after state update
+        setTimeout(() => {
+          navigate("/marketplace", { replace: true });
+        }, 100);
+
+      } catch (userErr) {
+        console.error("Failed to fetch user data:", userErr);
+        
+        // If we can't get user data, create a minimal user object
+        // You might need to adjust this based on what data you have
+        const minimalUser = {
+          id: 'temp', // You might want to decode the JWT to get user ID
+          username: email.split('@')[0], // Use email prefix as username temporarily
+          email: email
+        };
+        
+        localStorage.setItem("user", JSON.stringify(minimalUser));
+        onLogin(minimalUser);
+        
+        setTimeout(() => {
+          navigate("/marketplace", { replace: true });
+        }, 100);
+      }
+
     } catch (err) {
-      setError('Login failed. Please try again.');
+      console.error("Login error:", err);
+      
+      // Handle different types of errors
+      if (err.response) {
+        // Server responded with error status
+        const errorMessage = err.response.data?.message || err.response.data?.error || "Login failed";
+        setError(errorMessage);
+        console.log("Server error response:", err.response.data);
+      } else if (err.request) {
+        // Network error
+        setError("Network error. Please check your connection.");
+        console.log("Network error:", err.request);
+      } else {
+        // Other errors (like our validation errors)
+        setError(err.message || "An unexpected error occurred");
+      }
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Demo credentials helper
-  const fillDemoCredentials = () => {
-    setEmail('john@example.com');
-    setPassword('password123');
   };
 
   return (
@@ -52,22 +109,8 @@ const Login = ({ onLogin, theme, setTheme }) => {
             Sign in to your NFT Marketplace account
           </p>
         </div>
-        
-        <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-8 border border-slate-200 dark:border-slate-800">
-          {/* Demo credentials info */}
-          <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Demo Credentials:</p>
-            <p className="text-xs text-slate-500 dark:text-slate-500">Email: john@example.com</p>
-            <p className="text-xs text-slate-500 dark:text-slate-500 mb-2">Password: password123</p>
-            <button
-              type="button"
-              onClick={fillDemoCredentials}
-              className="text-xs text-blue-600 hover:text-blue-500 underline"
-            >
-              Click to fill demo credentials
-            </button>
-          </div>
 
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-8 border border-slate-200 dark:border-slate-800">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md text-sm">
@@ -76,7 +119,10 @@ const Login = ({ onLogin, theme, setTheme }) => {
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-2"
+              >
                 Email Address
               </label>
               <div className="relative">
@@ -98,7 +144,10 @@ const Login = ({ onLogin, theme, setTheme }) => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-2"
+              >
                 Password
               </label>
               <div className="relative">
@@ -108,7 +157,7 @@ const Login = ({ onLogin, theme, setTheme }) => {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   className="block w-full pl-10 pr-10 py-3 border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
@@ -142,14 +191,14 @@ const Login = ({ onLogin, theme, setTheme }) => {
                     Signing in...
                   </div>
                 ) : (
-                  'Sign In'
+                  "Sign In"
                 )}
               </button>
             </div>
 
             <div className="text-center">
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Don't have an account?{' '}
+                Don't have an account?{" "}
                 <Link
                   to="/signup"
                   className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
