@@ -6,7 +6,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Login from "./pages/Login";
+import Login from "./pages/login";
 import Signup from "./pages/Signup";
 import Marketplace from "./pages/Marketplace";
 import CreateNFT from "./pages/CreateNFT";
