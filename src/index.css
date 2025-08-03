@@ -1,6 +1,6 @@
-@import "tailwindcss";
-
-/* ✅ REMOVED all custom theme utility classes that conflict with Tailwind 4's built-in dark mode */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Base styles for overscroll prevention */
 html, body {
@@ -10,8 +10,8 @@ html, body {
 }
 
 /* Smooth theme transitions */
-body {
-  transition: background-color 0.3s ease, color 0.3s ease;
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Line clamp utility */

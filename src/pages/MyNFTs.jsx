@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import NavigationBar from '../components/NavigationBar';
 import Footer from '../components/Footer';
-import { dummyNFTs } from '../data/dummyData'; // Update import path as needed
+import { dummyNFTs } from '../data/dummyNFTs'; // Update import path as needed
 
 const MyNFTs = ({ user, onLogout, theme, setTheme }) => {
   const [nfts, setNfts] = useState(dummyNFTs);

@@ -63,7 +63,7 @@ const ListView = ({ items = [] }) => {
                   <div className="flex items-center space-x-2">
                     <div className="w-6 h-6 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
                       <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                        {item.owner.charAt(0).toUpperCase()}
+                        {/* {item.owner.charAt(0).toUpperCase()} */}
                       </span>
                     </div>
                     <span className="text-sm text-slate-600 dark:text-slate-400">

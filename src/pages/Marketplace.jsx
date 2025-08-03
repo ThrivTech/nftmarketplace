@@ -2,7 +2,7 @@ import React from 'react';
 import NavigationBar from '../components/NavigationBar';
 import ListView from '../components/ListView';
 import Footer from '../components/Footer';
-import { dummyNFTs } from '../data/dummyData';
+import { dummyNFTs } from '../data/dummyNFTs';
 
 const Marketplace = ({ user, onLogout, theme, setTheme }) => {
   return (
