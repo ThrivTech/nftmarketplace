@@ -43,7 +43,6 @@ const Signup = ({ onLogin }) => {
     setError("");
     setIsLoading(true);
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       setIsLoading(false);
@@ -57,11 +56,28 @@ const Signup = ({ onLogin }) => {
       payload.append("password", formData.password);
       if (formData.profilePicture) {
         payload.append("profilePic", formData.profilePicture);
+        payload.append("profilePicture", formData.profilePicture); // Optional fallback
       }
 
       await API.post("/auth/signup", payload);
-      alert("Signup successful! Please login.");
-      navigate("/");
+
+      // ✅ Auto-login after signup
+      const loginRes = await API.post("/auth/login", {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      const userData = loginRes.data?.user;
+      const token = loginRes.data?.token;
+
+      if (token && userData) {
+        localStorage.setItem("token", token);
+        if (onLogin) onLogin(userData);
+        navigate("/marketplace");
+      } else {
+        alert("Signup succeeded, but login failed.");
+        navigate("/");
+      }
     } catch (err) {
       console.error("Signup failed:", err.response?.data || err);
       alert("Signup failed");

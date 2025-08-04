@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -17,7 +16,6 @@ import API from './api';
 
 function App() {
   const [theme, setTheme] = useState(() => {
-    // Get theme from localStorage or system preference
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
       return savedTheme;
@@ -31,7 +29,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Apply theme to document
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
     localStorage.setItem("theme", theme);
@@ -41,50 +38,61 @@ function App() {
     const restoreSession = async () => {
       const savedUser = localStorage.getItem("user");
       const token = localStorage.getItem("token");
-      
-      // Check if we have valid saved data
+
       if (savedUser && savedUser !== "undefined" && savedUser !== "null" && token) {
         try {
-          const parsedUser = JSON.parse(savedUser); // Fix: Actually parse the JSON string
-          // Ensure parsedUser is a valid object
-          if (parsedUser && typeof parsedUser === 'object' && parsedUser.id) {
-            setUser(parsedUser);
+          const parsedUser = JSON.parse(savedUser);
+
+          // ✅ FIXED: use `name` instead of `id` for validity check
+          if (parsedUser && typeof parsedUser === 'object' && parsedUser.name) {
+            const rawPic = parsedUser.profilePic || parsedUser.profilePicture;
+
+            const normalizedUser = {
+              ...parsedUser,
+              username: parsedUser.username || parsedUser.name || "User",
+              profilePicture: rawPic?.startsWith("http")
+                ? rawPic
+                : `https://nftbackend-qz6p.onrender.com/${rawPic?.replace(/^\/+/, "")}`,
+            };
+
+            setUser(normalizedUser);
+            localStorage.setItem("user", JSON.stringify(normalizedUser));
           } else {
-            throw new Error('Invalid user data');
+            throw new Error("Invalid user data");
           }
         } catch (error) {
-          console.error('Session restoration failed:', error);
-          // Clear invalid session
-          localStorage.removeItem('user');
-          localStorage.removeItem('token');
+          console.error("Session restoration failed:", error);
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
           setUser(null);
         }
       } else {
-        // Clear any invalid data
         if (savedUser === "undefined" || savedUser === "null") {
-          localStorage.removeItem('user');
+          localStorage.removeItem("user");
         }
         if (!token) {
-          localStorage.removeItem('token');
+          localStorage.removeItem("token");
         }
       }
       setIsLoading(false);
     };
-    
+
     restoreSession();
   }, []);
 
   const handleLogin = (userData) => {
+    const rawPic = userData.profilePic || userData.profilePicture || userData.avatar;
     const normalizedUser = {
-    ...userData,
-    username: userData.username || userData.name || "User",
-    profilePicture: userData.profilePicture?.startsWith("http")
-      ? userData.profilePicture
-      : `https://nftbackend-qz6p.onrender.com/${userData.profilePicture}`,
-  };
-
-  localStorage.setItem("user", JSON.stringify(normalizedUser));
-  setUser(normalizedUser);
+      ...userData,
+      username: userData.username || userData.name || "User",
+      profilePicture: rawPic?.startsWith("http")
+        ? rawPic
+        : rawPic
+        ? `https://nftbackend-qz6p.onrender.com/${rawPic.replace(/^\/+/, "")}`
+        : "",
+    };
+    localStorage.setItem("user", JSON.stringify(normalizedUser));
+    setUser(normalizedUser);
   };
 
   const handleLogout = () => {
@@ -93,11 +101,12 @@ function App() {
     localStorage.removeItem("token");
   };
 
-  const handleUserUpdate = (updatedUser) => {
-    setUser(updatedUser);
-  };
+ const handleUserUpdate = (updatedUser) => {
+  setUser(updatedUser);
+  localStorage.setItem("user", JSON.stringify(updatedUser));
+};
 
-  // Show loading spinner while checking authentication
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
@@ -109,7 +118,6 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <Router>
-        {/* Always show theme toggle button */}
         <div className="fixed top-4 right-4 z-50">
           <ThemeToggleButton theme={theme} setTheme={setTheme} />
         </div>
@@ -173,7 +181,13 @@ function App() {
             path="/profile"
             element={
               user ? (
-                <Profile user={user} theme={theme} setTheme={setTheme} onLogout={handleLogout} onUserUpdate={handleUserUpdate} />
+                <Profile
+                  user={user}
+                  onUserUpdate={handleUserUpdate}
+                  theme={theme}
+                  setTheme={setTheme}
+                  onLogout={handleLogout}
+                />
               ) : (
                 <Navigate to="/" replace />
               )
