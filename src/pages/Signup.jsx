@@ -30,11 +30,24 @@ const Signup = ({ onLogin }) => {
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (e.g., max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image file size should be less than 5MB');
+        return;
+      }
+
       setFormData((prev) => ({
         ...prev,
         profilePicture: file,
       }));
       setPreview(URL.createObjectURL(file));
+      setError(""); // Clear any previous errors
     }
   };
 
@@ -50,37 +63,78 @@ const Signup = ({ onLogin }) => {
     }
 
     try {
+      // Create FormData for file upload
       const payload = new FormData();
       payload.append("name", formData.username);
       payload.append("email", formData.email);
       payload.append("password", formData.password);
+      
+      // Add profile picture if selected
       if (formData.profilePicture) {
         payload.append("profilePic", formData.profilePicture);
-        payload.append("profilePicture", formData.profilePicture); // Optional fallback
       }
 
-      await API.post("/auth/signup", payload);
+      console.log("Sending signup data:");
+      console.log("- name:", formData.username);
+      console.log("- email:", formData.email);
+      console.log("- profilePic:", formData.profilePicture ? "File selected" : "No file");
 
-      // ✅ Auto-login after signup
+      // Make sure to set correct headers for multipart/form-data
+      const signupResponse = await API.post("/auth/signup", payload, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      console.log("Signup response:", signupResponse.data);
+
+      // ✅ Auto-login after successful signup
       const loginRes = await API.post("/auth/login", {
         email: formData.email,
         password: formData.password,
       });
 
-      const userData = loginRes.data?.user;
       const token = loginRes.data?.token;
+      console.log("Login response:", loginRes.data);
 
-      if (token && userData) {
+      if (token) {
         localStorage.setItem("token", token);
+        
+        // Fetch user profile to get complete user data including profilePic
+        const userProfileRes = await API.get("/user/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        console.log("User profile response:", userProfileRes.data);
+
+        const userData = userProfileRes.data;
+        console.log("User data passed to onLogin:", userData);
+
         if (onLogin) onLogin(userData);
         navigate("/marketplace");
       } else {
-        alert("Signup succeeded, but login failed.");
+        setError("Signup succeeded, but login failed. Please try logging in manually.");
         navigate("/");
       }
     } catch (err) {
-      console.error("Signup failed:", err.response?.data || err);
-      alert("Signup failed");
+      console.error("Signup failed:", err);
+      
+      if (err.response) {
+        // Server responded with error status
+        const errorMessage = err.response.data?.message || err.response.data?.error || "Signup failed";
+        setError(errorMessage);
+        console.log("Server error response:", err.response.data);
+        
+        // Log specific field errors if available
+        if (err.response.data?.errors) {
+          console.log("Field errors:", err.response.data.errors);
+        }
+      } else if (err.request) {
+        // Network error
+        setError("Network error. Please check your connection.");
+      } else {
+        setError("An unexpected error occurred");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +167,7 @@ const Signup = ({ onLogin }) => {
                   {preview ? (
                     <img
                       src={preview}
-                      alt="Profile"
+                      alt="Profile Preview"
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -138,7 +192,7 @@ const Signup = ({ onLogin }) => {
                 </label>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-                Click the camera icon to upload a profile picture
+                Click the camera icon to upload a profile picture (max 5MB)
               </p>
             </div>
 
@@ -207,7 +261,11 @@ const Signup = ({ onLogin }) => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
-                  {showPassword ? <EyeOff /> : <Eye />}
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300" />
+                  )}
                 </button>
               </div>
             </div>
@@ -235,7 +293,11 @@ const Signup = ({ onLogin }) => {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
-                  {showConfirmPassword ? <EyeOff /> : <Eye />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300" />
+                  )}
                 </button>
               </div>
             </div>
@@ -244,9 +306,16 @@ const Signup = ({ onLogin }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg text-sm transition"
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg text-sm transition"
             >
-              {isLoading ? "Creating..." : "Create Account"}
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Creating Account...
+                </div>
+              ) : (
+                "Create Account"
+              )}
             </button>
 
             <div className="text-center">

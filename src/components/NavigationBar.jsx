@@ -150,6 +150,7 @@ const NavigationBar = ({ user, onLogout, theme, setTheme }) => {
                   <LogOut className="w-4 h-4" />
                   <span>Logout</span>
                 </button>
+                <GlobalThemeToggle theme={theme} setTheme={setTheme} />
               </div>
             </div>
           </div>
